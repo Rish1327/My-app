@@ -1,33 +1,52 @@
 import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
-import { Button, StyleSheet, Text, View, TextInput } from "react-native";
+import { useEffect } from "react";
+import { StyleSheet,  View,   FlatList } from "react-native";
+import GoalItem from "./components/GoalItem";
+import GoalInput from "./components/GoalInput";
+
 
 export default function App() {
-  const [goalText, setGoalText] = useState("");
   const [cousre, setCourse] = useState([]);
 
-  function goalInputHandler(enteredText) {
-    setGoalText(enteredText);
-  }
+  useEffect(() => {
+    
+    for(let i =0; i< 10000; i++) {
+      setCourse(cour => [...cour, {
+        item: {
+          text: "text" + i,
+          id: i.toString()
+        },
+      }])
+    }
 
-  function addGoalHandler() {
-    setCourse((currentCourseGoals) => [currentCourseGoals, goalText]);
-  }
+  }, [])
+  
 
+ function addGoalHandler(goalText) {
+    setCourse((currentCourseGoals) => 
+    [...currentCourseGoals,
+      { text:goalText,id:Math.random().toString()}
+    ]);
+  }
+  function deleteGoalHandler(id) {
+   setCourse((currentCourseGoals)=>{
+    return currentCourseGoals.filter((goal)=>goal.id!==id);
+   }); 
+  }
   return (
     <View style={styles.appContainer}>
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.textInput}
-          placeholder="Your cousre goal"
-          onChangeText={goalInputHandler}
-        />
-        <Button title="Add goal" onPress={addGoalHandler} />
-      </View>
-      <View style={styles.goalsContainer}>
-        {cousre.map((goal) => (
-          <Text>{goal}</Text>
-        ))}
+     <GoalInput addGoal={addGoalHandler}/>
+      <View  style={styles.goalsContainer}>
+      <FlatList 
+      data={cousre} 
+      renderItem={(itemData)=>{ 
+        return(
+          <GoalItem text={itemData.item.text} 
+          id={itemData.item.id}
+          onDelete={deleteGoalHandler}/>
+        );
+      }}/>
       </View>
     </View>
   );
@@ -38,24 +57,20 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 50,
     paddingHorizontal: 16,
+    backgroundColor:"#FBA158"
   },
-  inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingBottom: 24,
-    borderBottomWidth: 1,
-    borderBottomColor: "red",
-    flex: 1,
-  },
-  textInput: {
-    borderWidth: 1,
-    borderColor: "black",
-    width: "60%",
-    padding: 8,
-    margiRight: 8,
-  },
+ 
   goalsContainer: {
     flex: 6,
   },
+  goalItem: {
+   margin:8,
+   padding:9,
+   borderRadius:6,
+   backgroundColor: "#EF0058",
+  },
+  textstyle:{
+    color:"white"
+
+  }
 });
